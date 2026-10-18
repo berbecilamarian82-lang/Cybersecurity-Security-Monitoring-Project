@@ -4,6 +4,14 @@ failed_attempts = 0
 failed_by_ip = {}
 failed_by_username = {}
 
+def get_risk_level(count):
+    if count >= 5:
+        return "High"
+    elif count >= 3:
+        return "Medium"
+    else:
+        return "Low"
+
 with open("authentication_logs.csv", "r") as file:
     reader = csv.DictReader(file)
 
@@ -27,11 +35,13 @@ with open("authentication_logs.csv", "r") as file:
 print("Failed login attempts by IP address:")
 
 for ip_address, count in failed_by_ip.items():
-    print(ip_address, ":", count)
+    risk_level = get_risk_level(count)
+    print(ip_address, ":", count, "- Risk Level:", risk_level)
 
 print("\nFailed login attempts by username:")
 
 for username, count in failed_by_username.items():
-    print(username, ":", count)
+    risk_level = get_risk_level(count)
+    print(username, ":", count, "- Risk Level:", risk_level)
 
 print("\nTotal failed login attempts:", failed_attempts)
