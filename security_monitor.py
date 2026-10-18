@@ -4,6 +4,9 @@ failed_attempts = 0
 failed_by_ip = {}
 failed_by_username = {}
 usernames_by_ip = {}
+failed_history_by_user = {}
+successful_logins = []
+
 
 def get_risk_level(count):
     if count >= 5:
@@ -41,14 +44,18 @@ with open("authentication_logs.csv", "r") as file:
     reader = csv.DictReader(file)
 
     for row in reader:
+        ip_address = row["ip_address"]
+        username = row["username"]
+
         if row["login_result"] == "Failed":
             failed_attempts += 1
 
-            ip_address = row["ip_address"]
-            username = row["username"]
+            if username not in failed_history_by_user:
+                failed_history_by_user[username] = 0
+            failed_history_by_user[username] += 1
+
             if ip_address not in usernames_by_ip:
                 usernames_by_ip[ip_address] = set()
-
             usernames_by_ip[ip_address].add(username)
 
             if ip_address in failed_by_ip:
@@ -61,7 +68,30 @@ with open("authentication_logs.csv", "r") as file:
             else:
                 failed_by_username[username] = 1
 
-print("\nMultiple usernames targeted from the same IP address:")
+        elif row["login_result"] == "Success":
+            if failed_history_by_user.get(username, 0) >= 3:
+                successful_logins.append(
+                    {
+                        "username": username,
+                        "ip_address": ip_address,
+                        "failed_attempts": failed_history_by_user[username],
+                        "timestamp": row["timestamp"],
+                    }
+                )
+                failed_history_by_user[username] = 0
+
+
+
+
+print("\nFailed attempts followed by a successful login:")
+
+for event in successful_logins:
+    print(
+        f"SECURITY ALERT - HIGH PRIORITY: User {event['username']} "
+        f"successfully logged in from {event['ip_address']} after "
+        f"{event['failed_attempts']} failed attempts at {event['timestamp']}."
+    )
+print("\nMultiple usernames targeted from the same IP address:")   
 
 for ip_address, usernames in usernames_by_ip.items():
     if len(usernames) > 1:
