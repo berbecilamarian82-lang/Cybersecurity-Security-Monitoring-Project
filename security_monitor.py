@@ -3,6 +3,7 @@ import csv
 failed_attempts = 0
 failed_by_ip = {}
 failed_by_username = {}
+usernames_by_ip = {}
 
 def get_risk_level(count):
     if count >= 5:
@@ -45,6 +46,10 @@ with open("authentication_logs.csv", "r") as file:
 
             ip_address = row["ip_address"]
             username = row["username"]
+            if ip_address not in usernames_by_ip:
+                usernames_by_ip[ip_address] = set()
+
+            usernames_by_ip[ip_address].add(username)
 
             if ip_address in failed_by_ip:
                 failed_by_ip[ip_address] += 1
@@ -55,6 +60,15 @@ with open("authentication_logs.csv", "r") as file:
                 failed_by_username[username] += 1
             else:
                 failed_by_username[username] = 1
+
+print("\nMultiple usernames targeted from the same IP address:")
+
+for ip_address, usernames in usernames_by_ip.items():
+    if len(usernames) > 1:
+        print(
+            f"SECURITY ALERT - HIGH RISK: {ip_address} targeted multiple usernames: "
+            f"{', '.join(sorted(usernames))}"
+        )
 
 print("Failed login attempts by IP address:")
 
@@ -75,4 +89,5 @@ for username, count in failed_by_username.items():
     print(username, ":", count, "- Risk Level:", risk_level)
 
 print("\nTotal failed login attempts:", failed_attempts)
+
 
