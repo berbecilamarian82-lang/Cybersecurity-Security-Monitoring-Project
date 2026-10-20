@@ -40,6 +40,85 @@ def get_response_recommendation(risk_level):
     else:
         return "Continue monitoring the activity."
 
+def generate_analysis_summary(
+    failed_attempts,
+    failed_by_ip,
+    failed_by_username,
+    usernames_by_ip,
+    successful_logins
+):
+        print("\n==============================")
+        print("SECURITY ANALYSIS SUMMARY")
+        print("==============================")
+
+        print(f"\nTotal failed login attempts: {failed_attempts}")
+
+        if failed_by_ip:
+            highest_risk_ip = max(failed_by_ip, key=failed_by_ip.get)
+            highest_ip_count = failed_by_ip[highest_risk_ip]
+            highest_ip_risk = get_risk_level(highest_ip_count)
+
+            print("\nHighest-risk source IP:")
+            print(
+                f"{highest_risk_ip} - {highest_ip_count} failed attempts "
+                f"- {highest_ip_risk} Risk"
+            )
+
+        if failed_by_username:
+            highest_risk_username = max(
+                failed_by_username,
+                key=failed_by_username.get
+            )
+            highest_username_count = failed_by_username[highest_risk_username]
+            highest_username_risk = get_risk_level(highest_username_count)
+
+            print("\nHighest-risk username:")
+            print(
+                f"{highest_risk_username} - {highest_username_count} failed attempts "
+                f"- {highest_username_risk} Risk"
+            )
+
+        suspicious_patterns = []
+
+        for ip_address, usernames in usernames_by_ip.items():
+            if len(usernames) > 1:
+                suspicious_patterns.append(
+                    f"{ip_address} targeted multiple usernames"
+                )
+
+        for event in successful_logins:
+            suspicious_patterns.append(
+                f"User {event['username']} successfully logged in after "
+                f"{event['failed_attempts']} failed attempts"
+            )
+
+        print("\nSuspicious patterns detected:")
+
+        if suspicious_patterns:
+            for pattern in suspicious_patterns:
+                print(f"- {pattern}")
+        else:
+            print("- No major suspicious patterns detected")
+
+        high_risk_detected = any(
+            count >= 5 for count in failed_by_ip.values()
+        ) or any(
+            count >= 5 for count in failed_by_username.values()
+        )
+
+        if successful_logins or high_risk_detected:
+            print("\nOverall assessment:")
+            print("High-risk authentication activity detected.")
+            print("Immediate investigation is recommended.")
+        elif any(count >= 3 for count in failed_by_ip.values()):
+            print("\nOverall assessment:")
+            print("Medium-risk authentication activity detected.")
+            print("Further investigation is recommended.")
+        else:
+            print("\nOverall assessment:")
+            print("Low-risk authentication activity detected.")
+            print("Continue monitoring.")
+
 with open("authentication_logs.csv", "r") as file:
     reader = csv.DictReader(file)
 
@@ -119,5 +198,13 @@ for username, count in failed_by_username.items():
     print(username, ":", count, "- Risk Level:", risk_level)
 
 print("\nTotal failed login attempts:", failed_attempts)
+
+generate_analysis_summary(
+    failed_attempts,
+    failed_by_ip,
+    failed_by_username,
+    usernames_by_ip,
+    successful_logins
+)
 
 
