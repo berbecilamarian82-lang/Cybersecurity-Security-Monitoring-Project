@@ -190,9 +190,39 @@ The application reported:
 
 ---
 
+## Test 10 – Security Analysis Summary
+
+**Input condition:**  
+Run the complete authentication dataset through the security monitoring tool after all detection and classification functions have completed.
+
+**Expected result:**  
+The tool should generate a security analysis summary that identifies:
+
+- the total number of failed login attempts;
+- the highest-risk source IP address;
+- the highest-risk username;
+- suspicious authentication patterns;
+- an overall security assessment.
+
+**Actual result:**  
+The tool generated a complete Security Analysis Summary.
+
+The summary identified:
+
+- Total failed login attempts: `21`
+- Highest-risk source IP: `185.22.44.10` with `6` failed attempts
+- Highest-risk username: `admin` with `6` failed attempts
+- Suspicious activity from `203.0.113.50` targeting multiple usernames
+- User `sarah` successfully logging in after `5` failed attempts
+- Overall assessment: High-risk authentication activity detected
+- Recommended action: Immediate investigation
+
+**Status:**  
+**Passed**
+
 ## Overall Testing Result
 
-All nine planned test scenarios passed successfully.
+All ten planned test scenarios passed successfully.
 
 The testing confirmed that the Python security monitoring tool can:
 
