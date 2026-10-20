@@ -1,35 +1,47 @@
 # Cybersecurity Security Monitoring Project
 
 ## Project Title
-
 **Development of a Python-Based Security Monitoring Tool for Detecting Suspicious Authentication Activity**
 
 ## Project Overview
+This project is a Python-based security monitoring tool designed to analyse authentication log data and identify suspicious login activity.
 
-This project is being developed as part of the PFD200 Professional Development module.
+The tool was developed as part of my Professional Development module and supports my career goal of progressing towards a Cybersecurity Analyst or Junior SOC Analyst role.
 
-The purpose of the project is to develop a Python-based security monitoring tool that analyses authentication log data and identifies suspicious login behaviour.
+The project demonstrates practical use of Python for security monitoring, authentication log analysis, risk classification, alert generation, security analysis and incident response recommendations.
 
-The application is designed to detect patterns such as repeated failed login attempts, activity associated with the same IP address or username, and other authentication behaviour that may require further investigation.
-
-The project supports my professional development towards an entry-level cybersecurity role such as a Junior SOC Analyst or Cybersecurity Analyst.
+---
 
 ## Project Aim
+The aim of this project is to develop a Python-based monitoring tool that can analyse authentication logs, detect suspicious login activity, classify security risk and provide meaningful security analysis to support investigation.
 
-The main aim is to design and develop a Python application that can:
+---
+
+## Key Features
+
+The tool can:
 
 - read authentication log data from a CSV file;
-- identify failed login attempts;
-- group failed attempts by IP address;
-- group failed attempts by username;
-- classify suspicious activity by risk level;
-- generate security alerts;
-- provide response recommendations;
-- support testing using different authentication scenarios.
+- detect failed login attempts;
+- count total failed authentication attempts;
+- group failed login activity by IP address;
+- group failed login activity by username;
+- classify authentication activity as Low, Medium or High risk;
+- generate Medium and High Risk security alerts;
+- provide security response recommendations;
+- detect one source IP address targeting multiple usernames;
+- detect repeated failed login attempts followed by a successful login;
+- identify the highest-risk source IP address;
+- identify the highest-risk username;
+- identify suspicious authentication patterns;
+- generate an overall Security Analysis Summary;
+- recommend immediate investigation where high-risk activity is detected.
+
+---
 
 ## Detection Rules
 
-The project uses predefined detection rules for learning and demonstration purposes.
+The project uses the following project-defined detection thresholds:
 
 | Failed Login Attempts | Risk Level |
 |---|---|
@@ -37,57 +49,66 @@ The project uses predefined detection rules for learning and demonstration purpo
 | 3–4 | Medium |
 | 5 or more | High |
 
-Additional suspicious patterns will include:
+Additional suspicious authentication patterns include:
 
-- the same IP address targeting multiple usernames;
-- repeated failed attempts followed by a successful login.
+### Multiple Usernames Targeted from the Same IP
+If one source IP address generates failed authentication attempts against multiple usernames, the activity is treated as suspicious and classified as High Risk.
 
-These thresholds are project-defined and are not presented as universal industry standards.
+### Failed Attempts Followed by Successful Login
+If multiple failed authentication attempts are followed by a successful login, the event is treated as a High Priority Investigation because the successful authentication may indicate compromised credentials.
 
-For the complete detection rules, see:
+> These thresholds were defined specifically for this project and are not intended to represent universal industry security standards.
 
-[DETECTION_RULES.md](DETECTION_RULES.md)
+---
 
-## Current Project Progress
+## Security Response Recommendations
 
-Completed:
+### Low Risk
+- Continue monitoring the activity.
 
-- Authentication CSV dataset created
-- Detection rules defined
-- Python CSV reader implemented
-- Failed login attempts detected and counted
-- Failed attempts grouped by IP address
-- Failed attempts grouped by username
+### Medium Risk
+- Investigate the source IP address or affected account.
+- Review additional authentication logs for related activity.
 
-Currently in development:
+### High Risk
+- Investigate immediately.
+- Review the affected account and related logs.
+- Consider blocking the source IP address.
+- Reset credentials if compromise is suspected.
+- Enable Multi-Factor Authentication if it is not already enabled.
 
-- Low / Medium / High risk classification
+---
 
-Planned:
+## Security Analysis
 
-- Security alert generation
-- Response recommendations
-- Testing scenarios
-- Expected vs actual result testing
-- Final documentation and portfolio evidence
+In addition to detecting suspicious authentication events, the application generates an automated Security Analysis Summary.
 
-## Technologies Used
+The analysis identifies:
 
-- **Python 3** – application development
-- **CSV** – authentication log dataset
-- **Visual Studio Code** – coding and testing
-- **Git** – version control
-- **GitHub** – repository and project documentation
-- **GitHub Projects** – Kanban-style project management
+- total failed login attempts;
+- highest-risk source IP address;
+- highest-risk username;
+- suspicious authentication patterns;
+- overall security assessment;
+- recommended investigation priority.
 
-## Repository Structure
+Example analysis output:
 
 ```text
-Cybersecurity-Security-Monitoring-Project/
-│
-├── authentication_logs.csv
-├── DETECTION_RULES.md
-├── PROJECT_PROPOSAL.md
-├── SELF_ASSESSMENT.md
-├── security_monitor.py
-└── README.md 
+SECURITY ANALYSIS SUMMARY
+
+Total failed login attempts: 21
+
+Highest-risk source IP:
+185.22.44.10 - 6 failed attempts - High Risk
+
+Highest-risk username:
+admin - 6 failed attempts - High Risk
+
+Suspicious patterns detected:
+- 203.0.113.50 targeted multiple usernames
+- User sarah successfully logged in after 5 failed attempts
+
+Overall assessment:
+High-risk authentication activity detected.
+Immediate investigation is recommended.
